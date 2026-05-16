@@ -9,9 +9,17 @@ interface Props {
   initialSettings: Settings;
   onSettingsChange: (settings: Settings) => void;
   onComplete: (board: Board) => void;
+  onSkip: () => void;
+  onSkipAndTour: () => void;
 }
 
-export function SetupWizard({ initialSettings, onSettingsChange, onComplete }: Props) {
+export function SetupWizard({
+  initialSettings,
+  onSettingsChange,
+  onComplete,
+  onSkip,
+  onSkipAndTour,
+}: Props) {
   const [settings, setSettings] = useState<Settings>(initialSettings);
   const [step, setStep] = useState<Step>(initialSettings.openRouterKey ? 'objective' : 'keys');
   const [objective, setObjective] = useState('');
@@ -117,6 +125,8 @@ export function SetupWizard({ initialSettings, onSettingsChange, onComplete }: P
               settings={settings}
               onChange={updateSettings}
               onNext={() => setStep('objective')}
+              onSkip={onSkip}
+              onSkipAndTour={onSkipAndTour}
             />
           )}
 
@@ -151,24 +161,32 @@ function KeysStep({
   settings,
   onChange,
   onNext,
+  onSkip,
+  onSkipAndTour,
 }: {
   settings: Settings;
   onChange: (patch: Partial<Settings>) => void;
   onNext: () => void;
+  onSkip: () => void;
+  onSkipAndTour: () => void;
 }) {
+  const hasKey = !!settings.openRouterKey;
   return (
     <div className="space-y-4">
       <header>
-        <h2 className="text-lg font-semibold">Connect your APIs</h2>
+        <h2 className="text-lg font-semibold">
+          Connect your APIs{' '}
+          <span className="text-xs font-normal text-slate-500">(all optional)</span>
+        </h2>
         <p className="text-sm text-slate-400 mt-1">
-          Freello uses <strong>OpenRouter</strong> to draft your Kanban and{' '}
-          <strong>Giphy</strong> to embed fun GIFs on each card. Keys are stored locally in your
-          browser only.
+          Add an <strong>OpenRouter</strong> key to let Freello draft your Kanban from a prompt.
+          A <strong>Giphy</strong> key adds fun GIFs on each card. You can skip this and use
+          Freello as a plain manual Kanban — keys can be added later in Settings.
         </p>
       </header>
 
       <Field
-        label="OpenRouter API key"
+        label="OpenRouter API key (optional)"
         hint={
           <>
             Get one at{' '}
@@ -217,14 +235,29 @@ function KeysStep({
         placeholder="GIPHY_API_KEY"
       />
 
-      <div className="flex justify-end pt-2">
-        <button
-          disabled={!settings.openRouterKey}
-          onClick={onNext}
-          className="px-4 py-2 text-sm rounded-md bg-emerald-500 hover:bg-emerald-400 disabled:opacity-30 disabled:cursor-not-allowed text-slate-900 font-medium"
-        >
-          Continue →
-        </button>
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={onSkip}
+            className="px-4 py-2 text-sm rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700"
+          >
+            Skip — start empty
+          </button>
+          <button
+            onClick={onSkipAndTour}
+            className="px-4 py-2 text-sm rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700"
+          >
+            Take a quick tour
+          </button>
+        </div>
+        {hasKey && (
+          <button
+            onClick={onNext}
+            className="px-4 py-2 text-sm rounded-md bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-medium"
+          >
+            Continue → AI setup
+          </button>
+        )}
       </div>
     </div>
   );

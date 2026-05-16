@@ -52,6 +52,7 @@ export function KanbanColumn({ column, cards, onAdd, onCardClick }: Props) {
 
       <button
         onClick={onAdd}
+        data-tour={`add-card-${column.id}`}
         className="m-3 px-3 py-2 text-sm rounded-md bg-slate-800/60 hover:bg-slate-800 border border-dashed border-slate-700 text-slate-400 hover:text-slate-200"
       >
         + Add card
